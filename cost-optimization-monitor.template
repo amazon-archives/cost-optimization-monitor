@@ -1,0 +1,1965 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "(SO0010) - Cost Optimization Monitor - AWS CloudFormation Template for AWS Solutions Builder Cost Optimization Tool - Monitor - **WARNING** This template creates AWS resources. You will be billed for the AWS resources used if you create a stack from this template.",
+  "Parameters": {
+    "KeyName": {
+      "Description": "Existing Amazon EC2 key pair for SSH access to the instances to the Nginx proxy server",
+      "Type": "AWS::EC2::KeyPair::KeyName",
+      "ConstraintDescription": "must be the name of an existing EC2 KeyPair."
+    },
+    "SSHLocation": {
+      "Description": "IP address range that can access the Nginx proxy server",
+      "Type": "String",
+      "MinLength": "9",
+      "MaxLength": "18",
+      "AllowedPattern": "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})",
+      "ConstraintDescription": "must be a valid IP CIDR range of the form x.x.x.x/x."
+    },
+    "ElasticsearchDomainName": {
+      "Type": "String",
+      "Default": "comdomain",
+      "Description": "Name for the Amazon ES domain that this template will create. Note: Domain names must start with a lowercase letter and must be between 3 and 28 characters. Valid characters are a-z (lowercase only), 0-9, and – (hyphen)",
+      "AllowedPattern": "[a-z][a-z0-9\\-]+"
+    },
+	"ClusterSize": {
+      "Type": "String",
+      "Default": "Small",
+      "AllowedValues": [
+        "Small",
+        "Medium",
+        "Large"
+		],
+      "Description": "Amazon ES cluster size: small, medium, large"
+    },
+    "DBRBucketInput": {
+      "Type": "String",
+      "Description": "Select Yes if you want to use an existing S3 bucket to store detailed billing reports",
+      "Default": "No",
+      "AllowedValues": [
+        "Yes",
+        "No"
+      ]
+    },
+    "DBRBucketName": {
+      "Type": "String",
+      "Description": "If you selected Yes for the previous parameter, type the name of existing S3 bucket name that you want to use to store billing reports. If you selected No, leave this field empty"
+    },
+    "ProxyUsername": {
+      "Type": "String",
+      "Description": "User name for dashboard access via the proxy server"
+    },
+    "ProxyPass": {
+      "NoEcho": "true",
+      "Description": "Password for dashboard access via the proxy server",
+      "Type": "String",
+      "MinLength": "6",
+      "MaxLength": "41",
+      "AllowedPattern": "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&+=])(?=\\S+$).{6,}$",
+      "ConstraintDescription": "Must contain at least 1 Upper/Lower alphanumeric characters, number and !@#$%& (Mininum lenght is 6)"
+    },
+	"VPCCidrparameter": {
+		"Description": "CIDR block for VPC",
+		"Type": "String",
+		"MinLength": "9",
+		"MaxLength": "18",
+		"AllowedPattern": "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})",
+		"Default": "10.250.0.0/16",
+		"ConstraintDescription": "must be a valid IP CIDR range of the form x.x.x.x/x."
+	},
+	"Subnet1Cidrparameter": {
+		"Description": "IP address range for subnet created in AZ1",
+		"Type": "String",
+		"MinLength": "9",
+		"MaxLength": "18",
+		"AllowedPattern": "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})",
+		"Default": "10.250.250.0/24",
+		"ConstraintDescription": "must be a valid IP CIDR range of the form x.x.x.x/x."
+	},
+	"Subnet2Cidrparameter": {
+		"Description": "IP address range for subnet created in AZ2",
+		"Type": "String",
+		"MinLength": "9",
+		"MaxLength": "18",
+		"AllowedPattern": "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})",
+		"Default": "10.250.251.0/24",
+		"ConstraintDescription": "must be a valid IP CIDR range of the form x.x.x.x/x."
+	},
+    "SendAnonymousData": {
+      "Description": "Send anonymous data to AWS",
+      "Type": "String",
+      "Default": "Yes",
+      "AllowedValues": [
+        "Yes",
+        "No"
+      ]
+    }
+  },
+  "Metadata": {
+    "AWS::CloudFormation::Interface": {
+      "ParameterGroups": [
+      {
+        "Label" : { "default" : "Proxy Configuration" },
+        "Parameters" : [  "ProxyUsername", "ProxyPass", "SSHLocation", "KeyName" ]
+      },
+        {
+          "Label": {
+            "default": "Amazon ES Domain Configuration"
+          },
+          "Parameters": [
+            "ElasticsearchDomainName",
+            "ClusterSize"
+            ]
+        },
+        {
+          "Label": {
+            "default": "Amazon S3 Bucket Configuration"
+          },
+          "Parameters": [
+            "DBRBucketInput",
+            "DBRBucketName"
+          ]
+        },
+		{
+			"Label" : { "default" : "Network Settings" },
+			"Parameters" : [ "VPCCidrparameter", "Subnet1Cidrparameter", "Subnet2Cidrparameter" ]
+		},
+        {
+          "Label": {
+            "default": "Send anonymous data to AWS"
+          },
+          "Parameters": [
+            "SendAnonymousData"
+          ]
+        }
+
+      ],
+      "ParameterLabels" : {
+	  "SendAnonymousData" : {"default" : "Send Anonymous Usage Data" },
+	  "VPCCidrparameter" : {"default" : "VPC CIDR block" },
+	  "Subnet1Cidrparameter" : { "default" : "1st Subnet Network"},
+	  "Subnet2Cidrparameter" : { "default" : "2nd Subnet Network"},
+      "VpcCidr" : { "default" : "VPC CIDR Block" },
+      "PubSubnet" : { "default" : "Subnet Network" },
+      "InstanceType" : { "default" : "EC2 Instance Type" },
+      "KeyName" : { "default" : "SSH Key" },
+      "SSHLocation" : { "default" : "Access CIDR Block" },
+      "DBRBucketInput" : { "default" : "Use existing bucket?" },
+      "DBRBucketName" : { "default" : "Existing S3 bucket name" },
+      "ProxyUsername" : { "default" : "User Name" },
+      "ProxyPass" : { "default" : "Password" },
+      "ElasticsearchDomainName" : { "default" : "Domain Name" },
+      "ClusterSize" : { "default" : "Cluster Size" }
+     }
+
+    }
+  },
+  "Conditions": {
+    "SendData": {
+      "Fn::Equals": [
+        {
+          "Ref": "SendAnonymousData"
+        },
+        "Yes"
+      ]
+    },
+    "UseExistingBucket": {
+      "Fn::Equals": [
+        {
+          "Ref": "DBRBucketInput"
+        },
+        "Yes"
+      ]
+    },
+    "UseExistingBucketNot": {
+      "Fn::Equals": [
+        {
+          "Ref": "DBRBucketInput"
+        },
+        "No"
+      ]
+    },
+    "SendData": {
+      "Fn::Equals": [
+        {
+          "Ref": "SendAnonymousData"
+        },
+        "Yes"
+      ]
+    }
+
+  },
+  "Mappings": {
+    "Function": {
+      "KibanaUser": {
+        "UserName": "kibana",
+        "Password": "kibanacosttoo!"
+      }
+    },
+    "AWSInstanceType2Arch": {
+      "t1.micro": {
+        "Arch": "PV64"
+      },
+      "t2.nano": {
+        "Arch": "HVM64"
+      },
+      "t2.micro": {
+        "Arch": "HVM64"
+      },
+      "t2.small": {
+        "Arch": "HVM64"
+      },
+      "t2.medium": {
+        "Arch": "HVM64"
+      },
+      "t2.large": {
+        "Arch": "HVM64"
+      },
+      "m1.small": {
+        "Arch": "PV64"
+      },
+      "m1.medium": {
+        "Arch": "PV64"
+      },
+      "m1.large": {
+        "Arch": "PV64"
+      },
+      "m1.xlarge": {
+        "Arch": "PV64"
+      },
+      "m2.xlarge": {
+        "Arch": "PV64"
+      },
+      "m2.2xlarge": {
+        "Arch": "PV64"
+      },
+      "m2.4xlarge": {
+        "Arch": "PV64"
+      },
+      "m3.medium": {
+        "Arch": "HVM64"
+      },
+      "m3.large": {
+        "Arch": "HVM64"
+      },
+      "m3.xlarge": {
+        "Arch": "HVM64"
+      },
+      "m3.2xlarge": {
+        "Arch": "HVM64"
+      },
+      "m4.large": {
+        "Arch": "HVM64"
+      },
+      "m4.xlarge": {
+        "Arch": "HVM64"
+      },
+      "m4.2xlarge": {
+        "Arch": "HVM64"
+      },
+      "m4.4xlarge": {
+        "Arch": "HVM64"
+      },
+      "m4.10xlarge": {
+        "Arch": "HVM64"
+      },
+      "c1.medium": {
+        "Arch": "PV64"
+      },
+      "c1.xlarge": {
+        "Arch": "PV64"
+      },
+      "c3.large": {
+        "Arch": "HVM64"
+      },
+      "c3.xlarge": {
+        "Arch": "HVM64"
+      },
+      "c3.2xlarge": {
+        "Arch": "HVM64"
+      },
+      "c3.4xlarge": {
+        "Arch": "HVM64"
+      },
+      "c3.8xlarge": {
+        "Arch": "HVM64"
+      },
+      "c4.large": {
+        "Arch": "HVM64"
+      },
+      "c4.xlarge": {
+        "Arch": "HVM64"
+      },
+      "c4.2xlarge": {
+        "Arch": "HVM64"
+      },
+      "c4.4xlarge": {
+        "Arch": "HVM64"
+      },
+      "c4.8xlarge": {
+        "Arch": "HVM64"
+      },
+      "g2.2xlarge": {
+        "Arch": "HVMG2"
+      },
+      "g2.8xlarge": {
+        "Arch": "HVMG2"
+      },
+      "r3.large": {
+        "Arch": "HVM64"
+      },
+      "r3.xlarge": {
+        "Arch": "HVM64"
+      },
+      "r3.2xlarge": {
+        "Arch": "HVM64"
+      },
+      "r3.4xlarge": {
+        "Arch": "HVM64"
+      },
+      "r3.8xlarge": {
+        "Arch": "HVM64"
+      },
+      "i2.xlarge": {
+        "Arch": "HVM64"
+      },
+      "i2.2xlarge": {
+        "Arch": "HVM64"
+      },
+      "i2.4xlarge": {
+        "Arch": "HVM64"
+      },
+      "i2.8xlarge": {
+        "Arch": "HVM64"
+      },
+      "d2.xlarge": {
+        "Arch": "HVM64"
+      },
+      "d2.2xlarge": {
+        "Arch": "HVM64"
+      },
+      "d2.4xlarge": {
+        "Arch": "HVM64"
+      },
+      "d2.8xlarge": {
+        "Arch": "HVM64"
+      },
+      "hi1.4xlarge": {
+        "Arch": "HVM64"
+      },
+      "hs1.8xlarge": {
+        "Arch": "HVM64"
+      },
+      "cr1.8xlarge": {
+        "Arch": "HVM64"
+      },
+      "cc2.8xlarge": {
+        "Arch": "HVM64"
+      }
+    },
+    "AWSInstanceType2NATArch": {
+      "t1.micro": {
+        "Arch": "NATPV64"
+      },
+      "t2.nano": {
+        "Arch": "NATHVM64"
+      },
+      "t2.micro": {
+        "Arch": "NATHVM64"
+      },
+      "t2.small": {
+        "Arch": "NATHVM64"
+      },
+      "t2.medium": {
+        "Arch": "NATHVM64"
+      },
+      "t2.large": {
+        "Arch": "NATHVM64"
+      },
+      "m1.small": {
+        "Arch": "NATPV64"
+      },
+      "m1.medium": {
+        "Arch": "NATPV64"
+      },
+      "m1.large": {
+        "Arch": "NATPV64"
+      },
+      "m1.xlarge": {
+        "Arch": "NATPV64"
+      },
+      "m2.xlarge": {
+        "Arch": "NATPV64"
+      },
+      "m2.2xlarge": {
+        "Arch": "NATPV64"
+      },
+      "m2.4xlarge": {
+        "Arch": "NATPV64"
+      },
+      "m3.medium": {
+        "Arch": "NATHVM64"
+      },
+      "m3.large": {
+        "Arch": "NATHVM64"
+      },
+      "m3.xlarge": {
+        "Arch": "NATHVM64"
+      },
+      "m3.2xlarge": {
+        "Arch": "NATHVM64"
+      },
+      "m4.large": {
+        "Arch": "NATHVM64"
+      },
+      "m4.xlarge": {
+        "Arch": "NATHVM64"
+      },
+      "m4.2xlarge": {
+        "Arch": "NATHVM64"
+      },
+      "m4.4xlarge": {
+        "Arch": "NATHVM64"
+      },
+      "m4.10xlarge": {
+        "Arch": "NATHVM64"
+      },
+      "c1.medium": {
+        "Arch": "NATPV64"
+      },
+      "c1.xlarge": {
+        "Arch": "NATPV64"
+      },
+      "c3.large": {
+        "Arch": "NATHVM64"
+      },
+      "c3.xlarge": {
+        "Arch": "NATHVM64"
+      },
+      "c3.2xlarge": {
+        "Arch": "NATHVM64"
+      },
+      "c3.4xlarge": {
+        "Arch": "NATHVM64"
+      },
+      "c3.8xlarge": {
+        "Arch": "NATHVM64"
+      },
+      "c4.large": {
+        "Arch": "NATHVM64"
+      },
+      "c4.xlarge": {
+        "Arch": "NATHVM64"
+      },
+      "c4.2xlarge": {
+        "Arch": "NATHVM64"
+      },
+      "c4.4xlarge": {
+        "Arch": "NATHVM64"
+      },
+      "c4.8xlarge": {
+        "Arch": "NATHVM64"
+      },
+      "g2.2xlarge": {
+        "Arch": "NATHVMG2"
+      },
+      "g2.8xlarge": {
+        "Arch": "NATHVMG2"
+      },
+      "r3.large": {
+        "Arch": "NATHVM64"
+      },
+      "r3.xlarge": {
+        "Arch": "NATHVM64"
+      },
+      "r3.2xlarge": {
+        "Arch": "NATHVM64"
+      },
+      "r3.4xlarge": {
+        "Arch": "NATHVM64"
+      },
+      "r3.8xlarge": {
+        "Arch": "NATHVM64"
+      },
+      "i2.xlarge": {
+        "Arch": "NATHVM64"
+      },
+      "i2.2xlarge": {
+        "Arch": "NATHVM64"
+      },
+      "i2.4xlarge": {
+        "Arch": "NATHVM64"
+      },
+      "i2.8xlarge": {
+        "Arch": "NATHVM64"
+      },
+      "d2.xlarge": {
+        "Arch": "NATHVM64"
+      },
+      "d2.2xlarge": {
+        "Arch": "NATHVM64"
+      },
+      "d2.4xlarge": {
+        "Arch": "NATHVM64"
+      },
+      "d2.8xlarge": {
+        "Arch": "NATHVM64"
+      },
+      "hi1.4xlarge": {
+        "Arch": "NATHVM64"
+      },
+      "hs1.8xlarge": {
+        "Arch": "NATHVM64"
+      },
+      "cr1.8xlarge": {
+        "Arch": "NATHVM64"
+      },
+      "cc2.8xlarge": {
+        "Arch": "NATHVM64"
+      }
+    },
+    "AWSRegionArch2AMI": {
+      "us-east-1": {
+        "PV64": "ami-5fb8c835",
+        "HVM64": "ami-60b6c60a",
+        "HVMG2": "ami-e998ea83"
+      },
+      "us-east-2": {
+        "PV64": "ami-5fb8c835",
+        "HVM64": "ami-71ca9114",
+        "HVMG2": "ami-e998ea83"
+      },
+      "us-west-2": {
+        "PV64": "ami-d93622b8",
+        "HVM64": "ami-f0091d91",
+        "HVMG2": "ami-315f4850"
+      },
+      "us-west-1": {
+        "PV64": "ami-56ea8636",
+        "HVM64": "ami-d5ea86b5",
+        "HVMG2": "ami-943956f4"
+      },
+      "eu-west-1": {
+        "PV64": "ami-95e33ce6",
+        "HVM64": "ami-bff32ccc",
+        "HVMG2": "ami-83fd23f0"
+      },
+      "eu-central-1": {
+        "PV64": "ami-794a5915",
+        "HVM64": "ami-bc5b48d0",
+        "HVMG2": "ami-ba1a09d6"
+      },
+      "ap-northeast-1": {
+        "PV64": "ami-393c1957",
+        "HVM64": "ami-383c1956",
+        "HVMG2": "ami-08e5c166"
+      },
+      "ap-northeast-2": {
+        "PV64": "NOT_SUPPORTED",
+        "HVM64": "ami-249b554a",
+        "HVMG2": "NOT_SUPPORTED"
+      },
+      "ap-southeast-1": {
+        "PV64": "ami-34bd7a57",
+        "HVM64": "ami-c9b572aa",
+        "HVMG2": "ami-5a15d239"
+      },
+      "ap-southeast-2": {
+        "PV64": "ami-ced887ad",
+        "HVM64": "ami-48d38c2b",
+        "HVMG2": "ami-0c1a446f"
+      },
+      "sa-east-1": {
+        "PV64": "ami-7d15ad11",
+        "HVM64": "ami-6817af04",
+        "HVMG2": "NOT_SUPPORTED"
+      },
+      "cn-north-1": {
+        "PV64": "ami-18ac6575",
+        "HVM64": "ami-43a36a2e",
+        "HVMG2": "NOT_SUPPORTED"
+      }
+    },
+	"ec2instanceSizing": {
+      "elasticsearch": {
+        "Small": "t2.large",
+        "Medium": "m3.large",
+        "Large": "m3.xlarge"
+      }
+    },
+	"esinstanceSizing": {
+      "elasticsearch": {
+        "Small": "m3.medium.elasticsearch",
+        "Medium": "m3.large.elasticsearch",
+        "Large": "m3.xlarge.elasticsearch"
+      }
+    },
+	"esmasterSizing": {
+      "elasticsearch": {
+        "Small": "t2.small.elasticsearch",
+        "Medium": "t2.small.elasticsearch",
+        "Large": "m3.medium.elasticsearch"
+      }
+    },
+    "instanceCount": {
+      "elasticsearch": {
+        "Small": "2",
+        "Medium": "4",
+        "Large": "8"
+      }
+    }
+  },    
+  "Resources": {
+    "VPC": {
+      "Type": "AWS::EC2::VPC",
+      "Properties": {
+        "CidrBlock": {
+          "Ref": "VPCCidrparameter"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "Monitor VPC"
+          }
+        ]
+      }
+    },
+    "VPCRouteTable": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "VpcId": {
+          "Ref": "VPC"
+        },
+        "Tags": [
+          {
+            "Key": "Network",
+            "Value": "Public"
+          },
+          {
+            "Key": "Name",
+            "Value": "Monitor VPC"
+          }
+        ]
+      }
+    },
+    "IGW": {
+      "Type": "AWS::EC2::InternetGateway",
+      "Properties": {
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "Monitor VPC IGW"
+          }
+        ]
+      }
+    },
+    "IGWToInternet": {
+      "Type": "AWS::EC2::VPCGatewayAttachment",
+      "Properties": {
+        "VpcId": {
+          "Ref": "VPC"
+        },
+        "InternetGatewayId": {
+          "Ref": "IGW"
+        }
+      }
+    },
+    "VPCPublicRoute": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "VPCRouteTable"
+        },
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "GatewayId": {
+          "Ref": "IGW"
+        }
+      }
+    },
+    "VPCPubSub1": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "VpcId": {
+          "Ref": "VPC"
+        },
+        "CidrBlock": {
+          "Ref": "Subnet1Cidrparameter"
+        },
+        "AvailabilityZone": {
+          "Fn::Select": [
+            "0",
+            {
+              "Fn::GetAZs": ""
+            }
+          ]
+        },
+        "Tags": [
+          {
+            "Key": "Network",
+            "Value": "Public"
+          },
+          {
+            "Key": "Name",
+            "Value": "Monitor VPC Subnet"
+          }
+        ]
+      }
+    },
+    "VPCPubSub2": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "VpcId": {
+          "Ref": "VPC"
+        },
+        "CidrBlock": {
+          "Ref": "Subnet2Cidrparameter"
+        },
+        "AvailabilityZone": {
+          "Fn::Select": [
+            "1",
+            {
+              "Fn::GetAZs": ""
+            }
+          ]
+        },
+        "Tags": [
+          {
+            "Key": "Network",
+            "Value": "Public"
+          },
+          {
+            "Key": "Name",
+            "Value": "Monitor VPC Subnet"
+          }
+        ]
+      }
+    },
+    "VPCPubSubnet1RouteTableAssociation": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "SubnetId": {
+          "Ref": "VPCPubSub1"
+        },
+        "RouteTableId": {
+          "Ref": "VPCRouteTable"
+        }
+      }
+    },
+    "VPCPubSubnet2RouteTableAssociation": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "SubnetId": {
+          "Ref": "VPCPubSub2"
+        },
+        "RouteTableId": {
+          "Ref": "VPCRouteTable"
+        }
+      }
+    },
+    "S3DBRBucket": {
+      "Type": "AWS::S3::Bucket",
+      "Condition": "UseExistingBucketNot"
+    },
+    "S3DBRBucketPolicy": {
+      "Type": "AWS::S3::BucketPolicy",
+      "Condition": "UseExistingBucketNot",
+      "Properties": {
+        "Bucket": {
+          "Ref": "S3DBRBucket"
+        },
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "s3:GetBucketAcl",
+                "s3:GetBucketPolicy"
+              ],
+              "Principal": {
+                "AWS": "386209384616"
+              },
+              "Resource": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:aws:s3:::",
+                    {
+                      "Ref": "S3DBRBucket"
+                    }
+                  ]
+                ]
+              }
+            },
+            {
+              "Effect": "Allow",
+              "Action": "s3:PutObject",
+              "Principal": {
+                "AWS": "386209384616"
+              },
+              "Resource": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:aws:s3:::",
+                    {
+                      "Ref": "S3DBRBucket"
+                    },
+                    "/*"
+                  ]
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+	"ELBSecurityGroup": {
+		"Type": "AWS::EC2::SecurityGroup",
+		"Properties": {
+			"GroupDescription": "ELB - Port 80 access",
+			"VpcId": {
+				"Ref": "VPC"
+			},
+			"SecurityGroupIngress": [{
+				"IpProtocol": "tcp",
+				"FromPort": "80",
+				"ToPort": "80",
+				"CidrIp": {
+					"Ref": "SSHLocation"
+				}
+			}]
+		}
+	},
+	"ELB": {
+		"Type": "AWS::ElasticLoadBalancing::LoadBalancer",
+		"Properties": {
+			"SecurityGroups": [{
+				"Fn::GetAtt": ["ELBSecurityGroup", "GroupId"]
+			}],
+			"Subnets": [ { "Ref" : "VPCPubSub1"}, { "Ref" : "VPCPubSub2" }],
+			"CrossZone": "true",
+			"Instances": [ { "Ref": "ProxyServer1"}, { "Ref": "ProxyServer2" } ],
+			"LoadBalancerName": {
+				"Ref": "AWS::StackName"
+			},
+			"Listeners": [{
+				"LoadBalancerPort": "80",
+				"InstancePort": "80",
+				"Protocol": "HTTP"
+			}],
+			"HealthCheck": {
+				"Target": "TCP:80",
+				"HealthyThreshold": "3",
+				"UnhealthyThreshold": "5",
+				"Interval": "30",
+				"Timeout": "5"
+			}
+		}
+	},
+    "ProxyServerRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "ec2.amazonaws.com"
+                ]
+              },
+              "Action": [
+                "sts:AssumeRole"
+              ]
+            }
+          ]
+        },
+        "Path": "/",
+        "Policies": [
+          {
+            "PolicyName": "ProxyServerRole",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+				  "Action": [
+		                    "s3:GetObject"
+				  ],
+				  "Resource": { "Fn::Join": ["", ["arn:aws:s3:::",
+                      {
+                        "Fn::If": [
+                          "UseExistingBucket",
+                          {
+                            "Ref": "DBRBucketName"
+                          },
+                          {
+                            "Ref": "S3DBRBucket"
+                          }
+                        ]
+                      },
+			          "*" ]] }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "ProxyServerInstanceProfile": {
+      "Type": "AWS::IAM::InstanceProfile",
+      "Properties": {
+        "Path": "/",
+        "Roles": [
+          {
+            "Ref": "ProxyServerRole"
+          }
+        ]
+      }
+    },
+    "ProxyServerSecurityGroup": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "Enable HTTP access via port 80 locked down to the load balancer + SSH access",
+        "VpcId": {
+          "Ref": "VPC"
+        },
+        "SecurityGroupIngress": [
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "80",
+            "ToPort": "80",
+            "CidrIp": {
+              "Ref": "SSHLocation"
+            }
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "22",
+            "ToPort": "22",
+            "CidrIp": {
+              "Ref": "SSHLocation"
+            }
+		  },
+ 		  {
+ 			 "IpProtocol" : "tcp",
+			 "FromPort" : "80",
+			 "ToPort" : "80",
+			 "SourceSecurityGroupId" : {"Fn::GetAtt": [ "ELBSecurityGroup","GroupId" ]}
+		  }
+          ]
+      }
+    },
+    "ProxyServer1EIP": {
+      "Type": "AWS::EC2::EIP",
+      "Properties": {
+        "Domain": "vpc"
+      }
+    },
+    "ProxyServer1EIPAssoc": {
+      "Type": "AWS::EC2::EIPAssociation",
+      "Properties": {
+        "EIP": {
+          "Ref": "ProxyServer1EIP"
+        },
+        "InstanceId": {
+          "Ref": "ProxyServer1"
+        }
+      }
+    },
+    "ProxyServer1": {
+      "Type": "AWS::EC2::Instance",
+      "DependsOn": "VPCPubSubnet1RouteTableAssociation",
+      "Metadata": {
+        "AWS::CloudFormation::Init": {
+          "configSets": {
+            "Monitor_install": [
+              "install_cfn",
+              "install_nginx",
+              "configure_nginx",
+              "install_awsdbrparser",
+              "install_estool",
+              "populate_es"
+            ]
+          },
+          "install_cfn": {
+            "files": {
+              "/etc/cfn/cfn-hup.conf": {
+                "content": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "[main]\n",
+                      "stack=",
+                      {
+                        "Ref": "AWS::StackId"
+                      },
+                      "\n",
+                      "region=",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      "\n"
+                    ]
+                  ]
+                },
+                "mode": "000400",
+                "owner": "root",
+                "group": "root"
+              },
+              "/etc/cfn/hooks.d/cfn-auto-reloader.conf": {
+                "content": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "[cfn-auto-reloader-hook]\n",
+                      "triggers=post.update\n",
+                      "path=Resources.ProxyServer1.Metadata.AWS::CloudFormation::Init\n",
+                      "action=/opt/aws/bin/cfn-init -v ",
+                      "         --stack ",
+                      {
+                        "Ref": "AWS::StackName"
+                      },
+                      "         --resource ProxyServer1 ",
+                      "         --configsets Monitor_install ",
+                      "         --region ",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      "\n"
+                    ]
+                  ]
+                },
+                "mode": "000400",
+                "owner": "root",
+                "group": "root"
+              }
+            },
+            "services": {
+              "sysvinit": {
+                "cfn-hup": {
+                  "enabled": "true",
+                  "ensureRunning": "true",
+                  "files": [
+                    "/etc/cfn/cfn-hup.conf",
+                    "/etc/cfn/hooks.d/cfn-auto-reloader.conf"
+                  ]
+                }
+              }
+            }
+          },
+          "install_nginx": {
+            "packages": {
+              "yum": {
+                "nginx": [],
+                "git": []
+              }
+            },
+            "files": {
+              "/tmp/crontab": {
+                "content": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "#Content to include in the user crontab.\n",
+                      "#You can just create the file first and then copy to the crontab folder\n",
+                      "\n",
+                      "#Without this path the user wont find the dbrparser program\n",
+                      "PATH=/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:/opt/aws/bin:/home/dbrparser/.local/bin:/home/dbrparser/bin\n",
+                      "\n",
+                      "# m h dom mon dow usercommand\n",
+                      "00 23 * * * /tmp/dbr-job/job.sh >>/tmp/dbr-job/job.log\n",
+                      "30 23 1 * * /tmp/dbr-job/job.sh -pm >>/tmp/dbr-job/job.log\n"
+                    ]
+                  ]
+                },
+                "mode": "000400",
+                "owner": "root",
+                "group": "root"
+              },
+              "/tmp/setup.dbr": {
+                "content": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "adduser dbrparser\n",
+                      "mkdir /tmp/dbr-job\n",
+                      "cp /home/ec2-user/aws-detailed-billing-parser/job.sh /tmp/dbr-job\n",
+                      "sed -i 's/bucket-123456/",
+                      {
+                        "Fn::If": [
+                          "UseExistingBucket",
+                          {
+                            "Ref": "DBRBucketName"
+                          },
+                          {
+                            "Fn::GetAtt": [
+                              "S3DBRBucket",
+                              "DomainName"
+                            ]
+                          }
+                        ]
+                      },
+                      "/g' /tmp/dbr-job/job.sh\n",
+					  "sed -i 's:.s3.amazonaws.com::g' /tmp/dbr-job/job.sh\n",
+                      "sed -i 's/123456789012/",
+                      {
+                        "Ref": "AWS::AccountId"
+                      },
+                      "/g' /tmp/dbr-job/job.sh\n",
+                      "sed -i 's#/mnt/jobs#/tmp/dbr-job#g' /tmp/dbr-job/job.sh\n",
+                      "sed -i 's/elastic-search-host.endopoint.name/",
+                      {
+                      	"Fn::GetAtt": [
+                          "MyElasticsearchDomain",
+                          "DomainEndpoint"
+                        ]
+                      },
+                      "/g' /tmp/dbr-job/job.sh\n",
+                      "chown -R dbrparser:dbrparser /tmp/dbr-job\n",
+                      "chmod +x /tmp/dbr-job/job.sh\n",
+                      "crontab -u dbrparser /tmp/crontab\n",
+                      "\n"
+                    ]
+                  ]
+                },
+                "mode": "000700",
+                "owner": "root",
+                "group": "root"
+              },
+              "/tmp/setup.nginx": {
+                "content": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "#!/bin/bash\n",
+                      "yum update -y\n",
+                      "sed -i 's/elastic-search-host.endopoint.name/",
+                      {
+                      	"Fn::GetAtt": [
+                          "MyElasticsearchDomain",
+                          "DomainEndpoint"
+                        ]
+                      },
+                      "/g' /etc/nginx/default.d/default.conf\n",
+                      "nameserver=$(cat /etc/resolv.conf | grep nameserver | cut -d ' ' -f 2)\n",
+                      "sed -i 's/resolver-ip/'$nameserver'/g' /etc/nginx/default.d/default.conf\n"
+                    ]
+                  ]
+                },
+                "mode": "000700",
+                "owner": "root",
+                "group": "root"
+              },
+              "/tmp/es.sh": {
+                "content": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "#!/bin/bash -v\n",
+                      "\n",
+                      "PATH=/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:/opt/aws/bin:/home/ec2-user/.local/bin:/home/ec2-user/bin\n",
+                      "es-import -r ",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      " -e ",
+                      {
+                        "Fn::GetAtt": [
+                          "MyElasticsearchDomain",
+                          "DomainEndpoint"
+                        ]
+                      },
+                      " -p 80 -f /tmp/export.json"
+                    ]
+                  ]
+                },
+                "mode": "000700",
+                "owner": "root",
+                "group": "root"
+              },
+              "/etc/nginx/default.d/default.conf": {
+                "content": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "location / {\n",
+                      "   resolver resolver-ip;\n",
+                      "   set $es ",
+                      {
+                        "Fn::GetAtt": [
+                          "MyElasticsearchDomain",
+                          "DomainEndpoint"
+                        ]
+                      },
+                      ";\n",
+                      "   auth_basic 'Restricted';\n",
+                      "   auth_basic_user_file /etc/nginx/conf.d/kibana.htpasswd;\n",
+                      "   proxy_pass_request_headers off;\n",
+                      "   proxy_set_header Host $host;\n",
+                      "   proxy_set_header  X-Forwarded-For $proxy_add_x_forwarded_for;\n",
+                      "   proxy_pass http://$es;",
+                      "}\n"
+                    ]
+                  ]
+                },
+                "mode": "000644",
+                "owner": "root",
+                "group": "root"
+              }
+            },
+            "services": {
+              "sysvinit": {
+                "nginx": {
+                  "enabled": "true"
+                }
+              }
+            }
+          },
+          "configure_nginx": {
+            "commands": {
+              "0-setup": {
+                "command": "/tmp/setup.nginx",
+                "cwd": "/home/ec2-user"
+              }
+            }
+          },
+          "install_awsdbrparser": {
+            "commands": {
+              "0-git_clone": {
+                "command": "git clone https://github.com/awslabs/aws-detailed-billing-parser.git",
+                "cwd": "/home/ec2-user"
+              },
+              "1-python_setup": {
+                "command": "python setup.py install",
+                "cwd": "/home/ec2-user/aws-detailed-billing-parser"
+              },
+              "2-dbr_setup": {
+                "command": "/tmp/setup.dbr",
+                "cwd": "/home/ec2-user"
+              }
+            }
+          },
+          "install_estool": {
+            "commands": {
+              "0-git_clone": {
+                "command": "wget https://s3.amazonaws.com/solutions-reference/cost-optimization/v1/es_tools-0.1.3.tar.gz",
+                "cwd": "/home/ec2-user"
+              },
+              "1-python_setup": {
+                "command": "pip install es_tools-0.1.3.tar.gz",
+                "cwd": "/home/ec2-user"
+              },
+              "2-kibana_index": {
+                "command": "wget https://s3.amazonaws.com/solutions-reference/cost-optimization/v1/export.json",
+                "cwd": "/tmp/"
+              },
+              "3-import_dashboard": {
+                "command": "sh /tmp/es.sh"
+              }
+            }
+          },
+          "populate_es": {
+            "commands": {
+              "0-run_dbrparser": {
+                "command": "su - dbrparser -c '/tmp/dbr-job/job.sh >>/tmp/dbr-job/job.log'",
+                "cwd": "/tmp/dbr-job"
+              	}
+              }
+           }
+        }
+      },
+      "Properties": {
+        "ImageId": {
+          "Fn::FindInMap": [
+            "AWSRegionArch2AMI",
+            {
+              "Ref": "AWS::Region"
+            },
+            {
+              "Fn::FindInMap": [
+                "AWSInstanceType2Arch",
+                {
+		          "Fn::FindInMap": [
+		            "ec2instanceSizing",
+		            "elasticsearch",
+		            {
+		              "Ref": "ClusterSize"
+		            }
+		          ]
+		        },
+                "Arch"
+              ]
+            }
+          ]
+        },
+        "InstanceType": {
+	          "Fn::FindInMap": [
+	            "ec2instanceSizing",
+	            "elasticsearch",
+	            {
+	              "Ref": "ClusterSize"
+	            }
+	          ]
+	        },
+        "IamInstanceProfile": {
+          "Ref": "ProxyServerInstanceProfile"
+        },
+        "NetworkInterfaces": [
+          {
+            "AssociatePublicIpAddress": "true",
+            "DeviceIndex": "0",
+            "GroupSet": [
+              {
+                "Ref": "ProxyServerSecurityGroup"
+              }
+            ],
+            "SubnetId": {
+              "Ref": "VPCPubSub1"
+            }
+          }
+        ],
+        "KeyName": {
+          "Ref": "KeyName"
+        },
+        "UserData": {
+          "Fn::Base64": {
+            "Fn::Join": [
+              "",
+              [
+                "#!/bin/bash -xe\n",
+                "yum update -y aws-cfn-bootstrap\n",
+                "/opt/aws/bin/cfn-init -v ",
+                "         --stack ",
+                {
+                  "Ref": "AWS::StackName"
+                },
+                "         --resource ProxyServer1 ",
+                "         --configsets Monitor_install ",
+                "         --region ",
+                {
+                  "Ref": "AWS::Region"
+                },
+                "\n",
+                "/opt/aws/bin/cfn-signal -e $? ",
+                "         --stack ",
+                {
+                  "Ref": "AWS::StackName"
+                },
+                "         --resource ProxyServer1 ",
+                "         --region ",
+                {
+                  "Ref": "AWS::Region"
+                },
+                "\n",
+                "# Create a new username/password for nginx\n",
+                "printf ",
+                {
+                  "Ref": "ProxyUsername"
+                },
+                ":`openssl passwd -apr1 ",
+                {
+                  "Ref": "ProxyPass"
+                },
+                "` >> /etc/nginx/conf.d/kibana.htpasswd\n",
+                "# Remove the default location from nginx config\n",
+                "sed -ri '/location \\//,/.*\\}/d' /etc/nginx/nginx.conf\n",
+                "service nginx restart"
+              ]
+            ]
+          }
+        }
+      },
+      "CreationPolicy": {
+        "ResourceSignal": {
+          "Timeout": "PT15M"
+        }
+      }
+    },
+	"ProxyServer1Alarm": {
+		"Type": "AWS::CloudWatch::Alarm",
+		"Properties": {
+			"AlarmDescription": "Trigger a recovery when instance status check fails for 15 consecutive minutes.",
+			"Namespace": "AWS/EC2" ,
+			"MetricName": "StatusCheckFailed_System",
+			"Statistic": "Minimum",
+			"Period": "60",
+			"EvaluationPeriods": "15",
+			"ComparisonOperator": "GreaterThanThreshold",
+			"Threshold": "0",
+			"AlarmActions": [ {"Fn::Join" : ["", ["arn:aws:automate:", { "Ref" : "AWS::Region" }, ":ec2:recover" ]]} ],
+			"Dimensions": [{"Name": "InstanceId","Value": {"Ref": "ProxyServer1"}}]
+		}
+	},
+    "ProxyServer2EIP": {
+      "Type": "AWS::EC2::EIP",
+      "Properties": {
+        "Domain": "vpc"
+      }
+    },
+    "ProxyServer2EIPAssoc": {
+      "Type": "AWS::EC2::EIPAssociation",
+      "Properties": {
+        "EIP": {
+          "Ref": "ProxyServer2EIP"
+        },
+        "InstanceId": {
+          "Ref": "ProxyServer2"
+        }
+      }
+    },
+    "ProxyServer2": {
+      "Type": "AWS::EC2::Instance",
+      "DependsOn": "VPCPubSubnet2RouteTableAssociation",
+      "Metadata": {
+        "AWS::CloudFormation::Init": {
+          "configSets": {
+            "Monitor_install": [
+              "install_cfn",
+              "install_nginx",
+              "configure_nginx"
+            ]
+          },
+          "install_cfn": {
+            "files": {
+              "/etc/cfn/cfn-hup.conf": {
+                "content": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "[main]\n",
+                      "stack=",
+                      {
+                        "Ref": "AWS::StackId"
+                      },
+                      "\n",
+                      "region=",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      "\n"
+                    ]
+                  ]
+                },
+                "mode": "000400",
+                "owner": "root",
+                "group": "root"
+              },
+              "/etc/cfn/hooks.d/cfn-auto-reloader.conf": {
+                "content": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "[cfn-auto-reloader-hook]\n",
+                      "triggers=post.update\n",
+                      "path=Resources.ProxyServer2.Metadata.AWS::CloudFormation::Init\n",
+                      "action=/opt/aws/bin/cfn-init -v ",
+                      "         --stack ",
+                      {
+                        "Ref": "AWS::StackName"
+                      },
+                      "         --resource ProxyServer2 ",
+                      "         --configsets Monitor_install ",
+                      "         --region ",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      "\n"
+                    ]
+                  ]
+                },
+                "mode": "000400",
+                "owner": "root",
+                "group": "root"
+              }
+            },
+            "services": {
+              "sysvinit": {
+                "cfn-hup": {
+                  "enabled": "true",
+                  "ensureRunning": "true",
+                  "files": [
+                    "/etc/cfn/cfn-hup.conf",
+                    "/etc/cfn/hooks.d/cfn-auto-reloader.conf"
+                  ]
+                }
+              }
+            }
+          },
+          "install_nginx": {
+            "packages": {
+              "yum": {
+                "nginx": [],
+                "git": []
+              }
+            },
+            "files": {
+              "/tmp/setup.nginx": {
+                "content": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "sed -i 's/elastic-search-host.endopoint.name/",
+                      {
+                      	"Fn::GetAtt": [
+                          "MyElasticsearchDomain",
+                          "DomainEndpoint"
+                        ]
+                      },
+                      "/g' /etc/nginx/default.d/default.conf\n",
+                      "nameserver=$(cat /etc/resolv.conf | grep nameserver | cut -d ' ' -f 2)\n",
+                      "sed -i 's/resolver-ip/'$nameserver'/g' /etc/nginx/default.d/default.conf\n"
+                    ]
+                  ]
+                },
+                "mode": "000700",
+                "owner": "root",
+                "group": "root"
+              },
+              "/etc/nginx/default.d/default.conf": {
+                "content": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "location / {\n",
+                      "   resolver resolver-ip;\n",
+                      "   set $es ",
+                      {
+                        "Fn::GetAtt": [
+                          "MyElasticsearchDomain",
+                          "DomainEndpoint"
+                        ]
+                      },
+                      ";\n",
+                      "   auth_basic 'Restricted';\n",
+                      "   auth_basic_user_file /etc/nginx/conf.d/kibana.htpasswd;\n",
+                      "   proxy_pass_request_headers off;\n",
+                      "   proxy_set_header Host $host;\n",
+                      "   proxy_set_header  X-Forwarded-For $proxy_add_x_forwarded_for;\n",
+                      "   proxy_pass http://$es;",
+                      "}\n"
+                    ]
+                  ]
+                },
+                "mode": "000644",
+                "owner": "root",
+                "group": "root"
+              }
+            },
+            "services": {
+              "sysvinit": {
+                "nginx": {
+                  "enabled": "true"
+                }
+              }
+            }
+          },
+          "configure_nginx": {
+            "commands": {
+              "0-setup": {
+                "command": "/tmp/setup.nginx",
+                "cwd": "/home/ec2-user"
+              }
+            }
+          }
+        }
+      },
+      "Properties": {
+        "ImageId": {
+          "Fn::FindInMap": [
+            "AWSRegionArch2AMI",
+            {
+              "Ref": "AWS::Region"
+            },
+            {
+              "Fn::FindInMap": [
+                "AWSInstanceType2Arch",
+                {
+		          "Fn::FindInMap": [
+		            "ec2instanceSizing",
+		            "elasticsearch",
+		            {
+		              "Ref": "ClusterSize"
+		            }
+		          ]
+		        },
+                "Arch"
+              ]
+            }
+          ]
+        },
+        "InstanceType": {
+	          "Fn::FindInMap": [
+	            "ec2instanceSizing",
+	            "elasticsearch",
+	            {
+	              "Ref": "ClusterSize"
+	            }
+	          ]
+	        },
+        "IamInstanceProfile": {
+          "Ref": "ProxyServerInstanceProfile"
+        },
+        "NetworkInterfaces": [
+          {
+            "AssociatePublicIpAddress": "true",
+            "DeviceIndex": "0",
+            "GroupSet": [
+              {
+                "Ref": "ProxyServerSecurityGroup"
+              }
+            ],
+            "SubnetId": {
+              "Ref": "VPCPubSub2"
+            }
+          }
+        ],
+        "KeyName": {
+          "Ref": "KeyName"
+        },
+        "UserData": {
+          "Fn::Base64": {
+            "Fn::Join": [
+              "",
+              [
+                "#!/bin/bash -xe\n",
+                "yum update -y aws-cfn-bootstrap\n",
+                "/opt/aws/bin/cfn-init -v ",
+                "         --stack ",
+                {
+                  "Ref": "AWS::StackName"
+                },
+                "         --resource ProxyServer2 ",
+                "         --configsets Monitor_install ",
+                "         --region ",
+                {
+                  "Ref": "AWS::Region"
+                },
+                "\n",
+                "/opt/aws/bin/cfn-signal -e $? ",
+                "         --stack ",
+                {
+                  "Ref": "AWS::StackName"
+                },
+                "         --resource ProxyServer2 ",
+                "         --region ",
+                {
+                  "Ref": "AWS::Region"
+                },
+                "\n",
+                "# Create a new username/password for nginx\n",
+                "printf ",
+                {
+                  "Ref": "ProxyUsername"
+                },
+                ":`openssl passwd -apr1 ",
+                {
+                  "Ref": "ProxyPass"
+                },
+                "` >> /etc/nginx/conf.d/kibana.htpasswd\n",
+                "# Remove the default location from nginx config\n",
+                "sed -ri '/location \\//,/.*\\}/d' /etc/nginx/nginx.conf\n",
+                "service nginx restart"
+              ]
+            ]
+          }
+        }
+      },
+      "CreationPolicy": {
+        "ResourceSignal": {
+          "Timeout": "PT15M"
+        }
+      }
+    },
+	"ProxyServer2Alarm": {
+		"Type": "AWS::CloudWatch::Alarm",
+		"Properties": {
+			"AlarmDescription": "Trigger a recovery when instance status check fails for 15 consecutive minutes.",
+			"Namespace": "AWS/EC2" ,
+			"MetricName": "StatusCheckFailed_System",
+			"Statistic": "Minimum",
+			"Period": "60",
+			"EvaluationPeriods": "15",
+			"ComparisonOperator": "GreaterThanThreshold",
+			"Threshold": "0",
+			"AlarmActions": [ {"Fn::Join" : ["", ["arn:aws:automate:", { "Ref" : "AWS::Region" }, ":ec2:recover" ]]} ],
+			"Dimensions": [{"Name": "InstanceId","Value": {"Ref": "ProxyServer2"}}]
+		}
+	},
+    "MyElasticsearchDomain": {
+      "Type": "AWS::Elasticsearch::Domain",
+      "Properties": {
+        "DomainName": {
+          "Ref": "ElasticsearchDomainName"
+        },
+        "ElasticsearchVersion": "2.3",
+        "EBSOptions": {
+          "EBSEnabled": "true",
+          "VolumeType": "gp2",
+          "VolumeSize": "20"
+        }, 
+		"AccessPolicies": {
+				"Version": "2012-10-17",
+				"Statement": [
+      			{
+   					"Sid": "IP restriction",
+					"Action": "es:*",
+					"Principal": {
+						"AWS": "*"
+					},
+					"Effect": "Allow",
+					"Resource": {
+		                "Fn::Join": [
+		                  "",
+		                  [
+		                    "arn:aws:es:",
+			              {
+			                "Ref": "AWS::Region"
+			              },
+			              ":",
+			              {
+			                "Ref": "AWS::AccountId"
+			              },
+			              ":domain/",
+			              {
+			                "Ref": "ElasticsearchDomainName"
+			              },
+			              "/*"
+		                  ]
+		                ]
+	                },
+					"Condition": {
+						"IpAddress": {
+							"aws:SourceIp": [
+								{"Ref": "ProxyServer1EIP"}, {"Ref": "ProxyServer2EIP"}
+							]
+						}
+					}
+				},
+      			{
+   					"Sid": "EC2-Role restriction",
+					"Action": "es:*",
+					"Principal": {"AWS": { 
+		                "Fn::Join": [
+		                  "",
+		                  [
+			              {
+			                "Fn::GetAtt": [
+			                  "ProxyServerRole",
+			                  "Arn"
+			                ]
+			              }
+		                  ]
+		                ]
+					}},
+					"Effect": "Allow",
+					"Resource": {
+		                "Fn::Join": [
+		                  "",
+		                  [
+		                    "arn:aws:es:",
+			              {
+			                "Ref": "AWS::Region"
+			              },
+			              ":",
+			              {
+			                "Ref": "AWS::AccountId"
+			              },
+			              ":domain/",
+			              {
+			                "Ref": "ElasticsearchDomainName"
+			              },
+			              "/*"
+		                  ]
+		                ]
+	                }
+				}
+				]
+			},
+		"AdvancedOptions": {
+			"rest.action.multi.allow_explicit_index": "true"
+		},
+        "ElasticsearchClusterConfig": {
+          "ZoneAwarenessEnabled": "true",
+          "DedicatedMasterCount": "3",
+          "DedicatedMasterEnabled": "true",
+          "DedicatedMasterType": {
+	          "Fn::FindInMap": [
+	            "esmasterSizing",
+	            "elasticsearch",
+	            {
+	              "Ref": "ClusterSize"
+	            }
+	          ]
+	        },
+          "InstanceCount": {
+	          "Fn::FindInMap": [
+	            "instanceCount",
+	            "elasticsearch",
+	            {
+	              "Ref": "ClusterSize"
+	            }
+	          ]
+	        },
+          "InstanceType": {
+	          "Fn::FindInMap": [
+	            "esinstanceSizing",
+	            "elasticsearch",
+	            {
+	              "Ref": "ClusterSize"
+	            }
+	          ]
+	        }
+        }
+      }
+    },
+    "SolutionHelperRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version" : "2012-10-17",
+          "Statement": [ {
+            "Effect": "Allow",
+            "Principal": {
+              "Service": "lambda.amazonaws.com"
+            },
+            "Action": "sts:AssumeRole"
+          } ]
+        },
+        "Path": "/",
+          "Policies": [ {
+            "PolicyName": "Solution_Helper_Permissions",
+            "PolicyDocument": {
+              "Version" : "2012-10-17",
+	      "Statement": [
+		{
+		  "Effect": "Allow",
+		  "Action": [
+		    "logs:CreateLogGroup",
+		    "logs:CreateLogStream",
+		    "logs:PutLogEvents"
+		  ],
+			"Resource": { "Fn::Join" : ["", ["arn:aws:logs:",{"Ref" : "AWS::Region"},":",{ "Ref" : "AWS::AccountId" }, ":log-group:/aws/lambda/*" ]]}
+		}	     ]
+          }
+        } ]
+      }
+    },
+    "SolutionHelper": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+      	"Handler": "solution-helper.lambda_handler",
+      	"Role": { "Fn::GetAtt" : [ "SolutionHelperRole" , "Arn" ] },
+	       "Description": "This function creates a CloudFormation custom lambda resource that creates custom lambda functions by finding and replacing specific values from existing lambda function code.",
+      	"Code": {
+          "S3Bucket": {
+            "Fn::Join": [
+              "",
+              [
+                "solutions-",
+                {
+                  "Ref": "AWS::Region"
+                }
+              ]
+            ]
+          },
+          "S3Key": "library/solution-helper/v3/solution-helper.zip"
+        },
+        "Runtime": "python2.7",
+        "Timeout": "300"
+     }
+   },
+   "CreateUniqueID": {
+     "Type": "Custom::LoadLambda",
+     "Properties": {
+       "ServiceToken": { "Fn::GetAtt" : ["SolutionHelper", "Arn"] },
+       "Region": { "Ref": "AWS::Region" },
+       "CreateUniqueID" : "true"
+     }
+   },
+    "SendingAnonymousData": {
+    	"Type": "Custom::LoadLambda",
+		"Condition": "SendData",
+        "Properties": {
+       "ServiceToken": { "Fn::GetAtt" : ["SolutionHelper", "Arn"] },
+            "SendAnonymousData": {
+                "Fn::Join": [
+                    "",
+                    [
+                        "{ 'Solution' : '",
+                        "SO00010",
+                        "', ",
+                        "'UUID' : '",
+			              {
+			                "Fn::GetAtt": [
+			                  "CreateUniqueID",
+			                  "UUID"
+			                ]
+			              },
+                        "', ",
+                        "'Data': {",
+			              "'ClusterSize': '",
+			              {
+			                "Ref": "ClusterSize"
+			              },
+                        "'",
+                        "}",
+                        "}"
+                    ]
+                ]
+            }
+        }
+    }
+  },
+  "Outputs": {
+    "SingleDashboardURL": {
+      "Value": {
+        "Fn::Join": [
+          "",
+          [
+            "http://",{"Fn::GetAtt" : [ "ELB" , "DNSName" ]},
+            "/_plugin/kibana/#/dashboard/Single-Account-Dashboard?_g=%28refreshInterval:%28display:Off,pause:!f,section:0,value:0%29,time:%28from:now%2FM,mode:quick,to:now%2FM%29%29"
+          ]
+        ]
+      },
+      "Description": "Single Account Dashboard"
+    },
+    "ConsolidatedDashboardURL": {
+      "Value": {
+        "Fn::Join": [
+          "",
+          [
+            "http://",{"Fn::GetAtt" : [ "ELB" , "DNSName" ]},
+            "/_plugin/kibana/#/dashboard/Consolidated-Account-Dashboard?_g=%28refreshInterval:%28display:Off,pause:!f,section:0,value:0%29,time:%28from:now%2FM,mode:quick,to:now%2FM%29%29"
+          ]
+        ]
+      },
+      "Description": "Consolidated Account Dashboard"
+    },
+    "BucketName" : {
+	    "Description": "Bucket for storing Detailed Billing Records",  
+	    "Value" :  {
+                        "Fn::If": [
+                          "UseExistingBucket",
+                          {
+                            "Ref": "DBRBucketName"
+                          },
+                          {
+                            "Ref": "S3DBRBucket"
+                          }
+                        ]
+                      }
+
+  	},
+    "UUID": {
+      "Description": "Newly created random anonymous UUID.",
+      "Value": {
+        "Fn::GetAtt": [
+          "CreateUniqueID",
+          "UUID"
+        ]
+      }
+    }
+  }
+}
