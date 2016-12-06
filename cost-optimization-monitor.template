@@ -960,9 +960,7 @@
     "ProxyServer1EIPAssoc": {
       "Type": "AWS::EC2::EIPAssociation",
       "Properties": {
-        "EIP": {
-          "Ref": "ProxyServer1EIP"
-        },
+        "AllocationId":{"Fn::GetAtt" : [ "ProxyServer1EIP", "AllocationId" ]},
         "InstanceId": {
           "Ref": "ProxyServer1"
         }
@@ -1401,9 +1399,7 @@
     "ProxyServer2EIPAssoc": {
       "Type": "AWS::EC2::EIPAssociation",
       "Properties": {
-        "EIP": {
-          "Ref": "ProxyServer2EIP"
-        },
+        "AllocationId":{"Fn::GetAtt" : [ "ProxyServer2EIP", "AllocationId" ]},
         "InstanceId": {
           "Ref": "ProxyServer2"
         }
