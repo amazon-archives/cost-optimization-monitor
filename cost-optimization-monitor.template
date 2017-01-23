@@ -195,389 +195,20 @@
         "Password": "kibanacosttoo!"
       }
     },
-    "AWSInstanceType2Arch": {
-      "t1.micro": {
-        "Arch": "PV64"
-      },
-      "t2.nano": {
-        "Arch": "HVM64"
-      },
-      "t2.micro": {
-        "Arch": "HVM64"
-      },
-      "t2.small": {
-        "Arch": "HVM64"
-      },
-      "t2.medium": {
-        "Arch": "HVM64"
-      },
-      "t2.large": {
-        "Arch": "HVM64"
-      },
-      "m1.small": {
-        "Arch": "PV64"
-      },
-      "m1.medium": {
-        "Arch": "PV64"
-      },
-      "m1.large": {
-        "Arch": "PV64"
-      },
-      "m1.xlarge": {
-        "Arch": "PV64"
-      },
-      "m2.xlarge": {
-        "Arch": "PV64"
-      },
-      "m2.2xlarge": {
-        "Arch": "PV64"
-      },
-      "m2.4xlarge": {
-        "Arch": "PV64"
-      },
-      "m3.medium": {
-        "Arch": "HVM64"
-      },
-      "m3.large": {
-        "Arch": "HVM64"
-      },
-      "m3.xlarge": {
-        "Arch": "HVM64"
-      },
-      "m3.2xlarge": {
-        "Arch": "HVM64"
-      },
-      "m4.large": {
-        "Arch": "HVM64"
-      },
-      "m4.xlarge": {
-        "Arch": "HVM64"
-      },
-      "m4.2xlarge": {
-        "Arch": "HVM64"
-      },
-      "m4.4xlarge": {
-        "Arch": "HVM64"
-      },
-      "m4.10xlarge": {
-        "Arch": "HVM64"
-      },
-      "c1.medium": {
-        "Arch": "PV64"
-      },
-      "c1.xlarge": {
-        "Arch": "PV64"
-      },
-      "c3.large": {
-        "Arch": "HVM64"
-      },
-      "c3.xlarge": {
-        "Arch": "HVM64"
-      },
-      "c3.2xlarge": {
-        "Arch": "HVM64"
-      },
-      "c3.4xlarge": {
-        "Arch": "HVM64"
-      },
-      "c3.8xlarge": {
-        "Arch": "HVM64"
-      },
-      "c4.large": {
-        "Arch": "HVM64"
-      },
-      "c4.xlarge": {
-        "Arch": "HVM64"
-      },
-      "c4.2xlarge": {
-        "Arch": "HVM64"
-      },
-      "c4.4xlarge": {
-        "Arch": "HVM64"
-      },
-      "c4.8xlarge": {
-        "Arch": "HVM64"
-      },
-      "g2.2xlarge": {
-        "Arch": "HVMG2"
-      },
-      "g2.8xlarge": {
-        "Arch": "HVMG2"
-      },
-      "r3.large": {
-        "Arch": "HVM64"
-      },
-      "r3.xlarge": {
-        "Arch": "HVM64"
-      },
-      "r3.2xlarge": {
-        "Arch": "HVM64"
-      },
-      "r3.4xlarge": {
-        "Arch": "HVM64"
-      },
-      "r3.8xlarge": {
-        "Arch": "HVM64"
-      },
-      "i2.xlarge": {
-        "Arch": "HVM64"
-      },
-      "i2.2xlarge": {
-        "Arch": "HVM64"
-      },
-      "i2.4xlarge": {
-        "Arch": "HVM64"
-      },
-      "i2.8xlarge": {
-        "Arch": "HVM64"
-      },
-      "d2.xlarge": {
-        "Arch": "HVM64"
-      },
-      "d2.2xlarge": {
-        "Arch": "HVM64"
-      },
-      "d2.4xlarge": {
-        "Arch": "HVM64"
-      },
-      "d2.8xlarge": {
-        "Arch": "HVM64"
-      },
-      "hi1.4xlarge": {
-        "Arch": "HVM64"
-      },
-      "hs1.8xlarge": {
-        "Arch": "HVM64"
-      },
-      "cr1.8xlarge": {
-        "Arch": "HVM64"
-      },
-      "cc2.8xlarge": {
-        "Arch": "HVM64"
-      }
-    },
-    "AWSInstanceType2NATArch": {
-      "t1.micro": {
-        "Arch": "NATPV64"
-      },
-      "t2.nano": {
-        "Arch": "NATHVM64"
-      },
-      "t2.micro": {
-        "Arch": "NATHVM64"
-      },
-      "t2.small": {
-        "Arch": "NATHVM64"
-      },
-      "t2.medium": {
-        "Arch": "NATHVM64"
-      },
-      "t2.large": {
-        "Arch": "NATHVM64"
-      },
-      "m1.small": {
-        "Arch": "NATPV64"
-      },
-      "m1.medium": {
-        "Arch": "NATPV64"
-      },
-      "m1.large": {
-        "Arch": "NATPV64"
-      },
-      "m1.xlarge": {
-        "Arch": "NATPV64"
-      },
-      "m2.xlarge": {
-        "Arch": "NATPV64"
-      },
-      "m2.2xlarge": {
-        "Arch": "NATPV64"
-      },
-      "m2.4xlarge": {
-        "Arch": "NATPV64"
-      },
-      "m3.medium": {
-        "Arch": "NATHVM64"
-      },
-      "m3.large": {
-        "Arch": "NATHVM64"
-      },
-      "m3.xlarge": {
-        "Arch": "NATHVM64"
-      },
-      "m3.2xlarge": {
-        "Arch": "NATHVM64"
-      },
-      "m4.large": {
-        "Arch": "NATHVM64"
-      },
-      "m4.xlarge": {
-        "Arch": "NATHVM64"
-      },
-      "m4.2xlarge": {
-        "Arch": "NATHVM64"
-      },
-      "m4.4xlarge": {
-        "Arch": "NATHVM64"
-      },
-      "m4.10xlarge": {
-        "Arch": "NATHVM64"
-      },
-      "c1.medium": {
-        "Arch": "NATPV64"
-      },
-      "c1.xlarge": {
-        "Arch": "NATPV64"
-      },
-      "c3.large": {
-        "Arch": "NATHVM64"
-      },
-      "c3.xlarge": {
-        "Arch": "NATHVM64"
-      },
-      "c3.2xlarge": {
-        "Arch": "NATHVM64"
-      },
-      "c3.4xlarge": {
-        "Arch": "NATHVM64"
-      },
-      "c3.8xlarge": {
-        "Arch": "NATHVM64"
-      },
-      "c4.large": {
-        "Arch": "NATHVM64"
-      },
-      "c4.xlarge": {
-        "Arch": "NATHVM64"
-      },
-      "c4.2xlarge": {
-        "Arch": "NATHVM64"
-      },
-      "c4.4xlarge": {
-        "Arch": "NATHVM64"
-      },
-      "c4.8xlarge": {
-        "Arch": "NATHVM64"
-      },
-      "g2.2xlarge": {
-        "Arch": "NATHVMG2"
-      },
-      "g2.8xlarge": {
-        "Arch": "NATHVMG2"
-      },
-      "r3.large": {
-        "Arch": "NATHVM64"
-      },
-      "r3.xlarge": {
-        "Arch": "NATHVM64"
-      },
-      "r3.2xlarge": {
-        "Arch": "NATHVM64"
-      },
-      "r3.4xlarge": {
-        "Arch": "NATHVM64"
-      },
-      "r3.8xlarge": {
-        "Arch": "NATHVM64"
-      },
-      "i2.xlarge": {
-        "Arch": "NATHVM64"
-      },
-      "i2.2xlarge": {
-        "Arch": "NATHVM64"
-      },
-      "i2.4xlarge": {
-        "Arch": "NATHVM64"
-      },
-      "i2.8xlarge": {
-        "Arch": "NATHVM64"
-      },
-      "d2.xlarge": {
-        "Arch": "NATHVM64"
-      },
-      "d2.2xlarge": {
-        "Arch": "NATHVM64"
-      },
-      "d2.4xlarge": {
-        "Arch": "NATHVM64"
-      },
-      "d2.8xlarge": {
-        "Arch": "NATHVM64"
-      },
-      "hi1.4xlarge": {
-        "Arch": "NATHVM64"
-      },
-      "hs1.8xlarge": {
-        "Arch": "NATHVM64"
-      },
-      "cr1.8xlarge": {
-        "Arch": "NATHVM64"
-      },
-      "cc2.8xlarge": {
-        "Arch": "NATHVM64"
-      }
-    },
-    "AWSRegionArch2AMI": {
-      "us-east-1": {
-        "PV64": "ami-5fb8c835",
-        "HVM64": "ami-60b6c60a",
-        "HVMG2": "ami-e998ea83"
-      },
-      "us-east-2": {
-        "PV64": "ami-5fb8c835",
-        "HVM64": "ami-71ca9114",
-        "HVMG2": "ami-e998ea83"
-      },
-      "us-west-2": {
-        "PV64": "ami-d93622b8",
-        "HVM64": "ami-f0091d91",
-        "HVMG2": "ami-315f4850"
-      },
-      "us-west-1": {
-        "PV64": "ami-56ea8636",
-        "HVM64": "ami-d5ea86b5",
-        "HVMG2": "ami-943956f4"
-      },
-      "eu-west-1": {
-        "PV64": "ami-95e33ce6",
-        "HVM64": "ami-bff32ccc",
-        "HVMG2": "ami-83fd23f0"
-      },
-      "eu-central-1": {
-        "PV64": "ami-794a5915",
-        "HVM64": "ami-bc5b48d0",
-        "HVMG2": "ami-ba1a09d6"
-      },
-      "ap-northeast-1": {
-        "PV64": "ami-393c1957",
-        "HVM64": "ami-383c1956",
-        "HVMG2": "ami-08e5c166"
-      },
-      "ap-northeast-2": {
-        "PV64": "NOT_SUPPORTED",
-        "HVM64": "ami-249b554a",
-        "HVMG2": "NOT_SUPPORTED"
-      },
-      "ap-southeast-1": {
-        "PV64": "ami-34bd7a57",
-        "HVM64": "ami-c9b572aa",
-        "HVMG2": "ami-5a15d239"
-      },
-      "ap-southeast-2": {
-        "PV64": "ami-ced887ad",
-        "HVM64": "ami-48d38c2b",
-        "HVMG2": "ami-0c1a446f"
-      },
-      "sa-east-1": {
-        "PV64": "ami-7d15ad11",
-        "HVM64": "ami-6817af04",
-        "HVMG2": "NOT_SUPPORTED"
-      },
-      "cn-north-1": {
-        "PV64": "ami-18ac6575",
-        "HVM64": "ami-43a36a2e",
-        "HVMG2": "NOT_SUPPORTED"
-      }
+    "AmiMap" : {
+      "us-east-1"       : {"HVM64":"ami-9be6f38c"},
+      "us-east-2"       : {"HVM64":"ami-38cd975d"},
+      "us-west-2"       : {"HVM64":"ami-1e299d7e"},
+      "us-west-1"       : {"HVM64":"ami-b73d6cd7"},
+      "eu-west-1"       : {"HVM64":"ami-c51e3eb6"},
+      "eu-central-1"    : {"HVM64":"ami-211ada4e"},
+      "ap-northeast-1"  : {"HVM64":"ami-9f0c67f8"},
+      "ap-northeast-2"  : {"HVM64":"ami-94bb6dfa"},
+      "ap-southeast-1"  : {"HVM64":"ami-4dd6782e"},
+      "ap-southeast-2"  : {"HVM64":"ami-28cff44b"},
+      "sa-east-1"       : {"HVM64":"ami-bb40d8d7"},
+      "cn-north-1"      : {"HVM64":"ami-29934444"},
+      "ap-south-1"      : {"HVM64":"ami-9fc7b0f0"}
     },
 	"ec2instanceSizing": {
       "elasticsearch": {
@@ -586,18 +217,43 @@
         "Large": "m3.xlarge"
       }
     },
+    "esRegion2Type": {
+      "us-east-1": {"type": "elasticsearchm3"},
+      "us-east-2": {"type": "elasticsearchm4"},
+      "us-west-2": {"type": "elasticsearchm3"},
+      "us-west-1": {"type": "elasticsearchm3"},
+      "eu-west-1": {"type": "elasticsearchm3"},
+      "eu-central-1": {"type": "elasticsearchm3"},
+      "ap-northeast-1": {"type": "elasticsearchm3"},
+      "ap-northeast-2": {"type": "elasticsearchm4"},
+      "ap-south-1": {"type": "elasticsearchm4"},
+      "ap-southeast-1": {"type": "elasticsearchm3"},
+      "ap-southeast-2": {"type": "elasticsearchm3"},
+      "sa-east-1": {"type": "elasticsearchm3"},
+      "cn-north-1": {"type": "elasticsearchm3"}
+    },
 	"esinstanceSizing": {
-      "elasticsearch": {
+      "elasticsearchm3": {
         "Small": "m3.medium.elasticsearch",
         "Medium": "m3.large.elasticsearch",
         "Large": "m3.xlarge.elasticsearch"
+      },
+      "elasticsearchm4": {
+        "Small": "m4.large.elasticsearch",
+        "Medium": "m4.large.elasticsearch",
+        "Large": "m4.xlarge.elasticsearch"
       }
     },
 	"esmasterSizing": {
-      "elasticsearch": {
+      "elasticsearchm3": {
         "Small": "t2.small.elasticsearch",
         "Medium": "t2.small.elasticsearch",
         "Large": "m3.medium.elasticsearch"
+      },
+      "elasticsearchm4": {
+        "Small": "t2.small.elasticsearch",
+        "Medium": "t2.small.elasticsearch",
+        "Large": "m4.large.elasticsearch"
       }
     },
     "instanceCount": {
@@ -954,13 +610,17 @@
     "ProxyServer1EIP": {
       "Type": "AWS::EC2::EIP",
       "Properties": {
-        "Domain": "vpc"
+        "Domain": {
+					"Ref": "VPC"
+				}
       }
     },
     "ProxyServer1EIPAssoc": {
       "Type": "AWS::EC2::EIPAssociation",
       "Properties": {
-        "AllocationId":{"Fn::GetAtt" : [ "ProxyServer1EIP", "AllocationId" ]},
+        "EIP": {
+					"Ref": "ProxyServer1EIP"
+				},
         "InstanceId": {
           "Ref": "ProxyServer1"
         }
@@ -1067,8 +727,8 @@
                       "PATH=/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:/opt/aws/bin:/home/dbrparser/.local/bin:/home/dbrparser/bin\n",
                       "\n",
                       "# m h dom mon dow usercommand\n",
-                      "00 23 * * * /tmp/dbr-job/job.sh >>/tmp/dbr-job/job.log\n",
-                      "30 23 1 * * /tmp/dbr-job/job.sh -pm >>/tmp/dbr-job/job.log\n"
+                      "00 23 * * * /home/dbrparser/dbr-job/job.sh >>/home/dbrparser/dbr-job/job.log\n",
+                      "30 23 1 * * /home/dbrparser/dbr-job/job.sh -pm >>/home/dbrparser/dbr-job/job.log\n"
                     ]
                   ]
                 },
@@ -1082,8 +742,9 @@
                     "",
                     [
                       "adduser dbrparser\n",
-                      "mkdir /tmp/dbr-job\n",
-                      "cp /home/ec2-user/aws-detailed-billing-parser/job.sh /tmp/dbr-job\n",
+                      "mkdir /home/dbrparser/dbr-job\n",
+                      "cp /tmp/crontab /home/dbrparser/crontab\n",
+                      "cp /home/ec2-user/aws-detailed-billing-parser/job.sh /home/dbrparser/dbr-job\n",
                       "sed -i 's/bucket-123456/",
                       {
                         "Fn::If": [
@@ -1099,14 +760,14 @@
                           }
                         ]
                       },
-                      "/g' /tmp/dbr-job/job.sh\n",
-					  "sed -i 's:.s3.amazonaws.com::g' /tmp/dbr-job/job.sh\n",
+                      "/g' /home/dbrparser/dbr-job/job.sh\n",
+					  "sed -i 's:.s3.amazonaws.com::g' /home/dbrparser/dbr-job/job.sh\n",
                       "sed -i 's/123456789012/",
                       {
                         "Ref": "AWS::AccountId"
                       },
-                      "/g' /tmp/dbr-job/job.sh\n",
-                      "sed -i 's#/mnt/jobs#/tmp/dbr-job#g' /tmp/dbr-job/job.sh\n",
+                      "/g' /home/dbrparser/dbr-job/job.sh\n",
+                      "sed -i 's#/mnt/jobs#/home/dbrparser/dbr-job#g' /home/dbrparser/dbr-job/job.sh\n",
                       "sed -i 's/elastic-search-host.endopoint.name/",
                       {
                       	"Fn::GetAtt": [
@@ -1114,10 +775,14 @@
                           "DomainEndpoint"
                         ]
                       },
-                      "/g' /tmp/dbr-job/job.sh\n",
-                      "chown -R dbrparser:dbrparser /tmp/dbr-job\n",
-                      "chmod +x /tmp/dbr-job/job.sh\n",
-                      "crontab -u dbrparser /tmp/crontab\n",
+                      "/g' /home/dbrparser/dbr-job/job.sh\n",
+                      "chown -R dbrparser:dbrparser /home/dbrparser/dbr-job\n",
+                      "chmod +x /home/dbrparser/dbr-job/job.sh\n",
+                      "#try the initial import with awsauth option\n",
+                      "# the initial import still doesn't work but leaving this code in for future reference\n",
+                      "cp /home/dbrparser/dbr-job/job.sh /home/dbrparser/dbr-job/jobawsauth.sh\n",
+                      "sed -i 's#--delete-index –bi#--delete-index –bi --awsauth#g' /home/dbrparser/dbr-job/jobawsauth.sh\n",
+                      "crontab -u dbrparser /home/dbrparser/crontab\n",
                       "\n"
                     ]
                   ]
@@ -1242,7 +907,7 @@
           "install_estool": {
             "commands": {
               "0-git_clone": {
-                "command": "wget https://s3.amazonaws.com/solutions-reference/cost-optimization/v1/es_tools-0.1.3.tar.gz",
+                "command": "wget https://s3.amazonaws.com/solutions-reference/cost-optimization/v2/es_tools-0.1.3.tar.gz",
                 "cwd": "/home/ec2-user"
               },
               "1-python_setup": {
@@ -1250,7 +915,7 @@
                 "cwd": "/home/ec2-user"
               },
               "2-kibana_index": {
-                "command": "wget https://s3.amazonaws.com/solutions-reference/cost-optimization/v1/export.json",
+                "command": "wget https://s3.amazonaws.com/solutions-reference/cost-optimization/v2/export.json",
                 "cwd": "/tmp/"
               },
               "3-import_dashboard": {
@@ -1261,37 +926,15 @@
           "populate_es": {
             "commands": {
               "0-run_dbrparser": {
-                "command": "su - dbrparser -c '/tmp/dbr-job/job.sh >>/tmp/dbr-job/job.log'",
-                "cwd": "/tmp/dbr-job"
+                "command": "su - dbrparser -c '/home/dbrparser/dbr-job/jobawsauth.sh >>/home/dbrparser/dbr-job/jobawsauth.log'",
+                "cwd": "/home/dbrparser/dbr-job"
               	}
               }
            }
         }
       },
       "Properties": {
-        "ImageId": {
-          "Fn::FindInMap": [
-            "AWSRegionArch2AMI",
-            {
-              "Ref": "AWS::Region"
-            },
-            {
-              "Fn::FindInMap": [
-                "AWSInstanceType2Arch",
-                {
-		          "Fn::FindInMap": [
-		            "ec2instanceSizing",
-		            "elasticsearch",
-		            {
-		              "Ref": "ClusterSize"
-		            }
-		          ]
-		        },
-                "Arch"
-              ]
-            }
-          ]
-        },
+        "ImageId": { "Fn::FindInMap" : [ "AmiMap", { "Ref" : "AWS::Region" }, "HVM64"]},
         "InstanceType": {
 	          "Fn::FindInMap": [
 	            "ec2instanceSizing",
@@ -1393,13 +1036,17 @@
     "ProxyServer2EIP": {
       "Type": "AWS::EC2::EIP",
       "Properties": {
-        "Domain": "vpc"
+        "Domain": {
+					"Ref": "VPC"
+				}
       }
     },
     "ProxyServer2EIPAssoc": {
       "Type": "AWS::EC2::EIPAssociation",
       "Properties": {
-        "AllocationId":{"Fn::GetAtt" : [ "ProxyServer2EIP", "AllocationId" ]},
+        "EIP": {
+					"Ref": "ProxyServer2EIP"
+				},
         "InstanceId": {
           "Ref": "ProxyServer2"
         }
@@ -1562,29 +1209,7 @@
         }
       },
       "Properties": {
-        "ImageId": {
-          "Fn::FindInMap": [
-            "AWSRegionArch2AMI",
-            {
-              "Ref": "AWS::Region"
-            },
-            {
-              "Fn::FindInMap": [
-                "AWSInstanceType2Arch",
-                {
-		          "Fn::FindInMap": [
-		            "ec2instanceSizing",
-		            "elasticsearch",
-		            {
-		              "Ref": "ClusterSize"
-		            }
-		          ]
-		        },
-                "Arch"
-              ]
-            }
-          ]
-        },
+        "ImageId": { "Fn::FindInMap" : [ "AmiMap", { "Ref" : "AWS::Region" }, "HVM64"]},
         "InstanceType": {
 	          "Fn::FindInMap": [
 	            "ec2instanceSizing",
@@ -1783,7 +1408,15 @@
           "DedicatedMasterType": {
 	          "Fn::FindInMap": [
 	            "esmasterSizing",
-	            "elasticsearch",
+	            {
+		          "Fn::FindInMap": [
+		            "esRegion2Type",
+		            {
+			          "Ref": "AWS::Region"
+			        },
+		            "type"
+		          ]
+		        },
 	            {
 	              "Ref": "ClusterSize"
 	            }
@@ -1801,7 +1434,15 @@
           "InstanceType": {
 	          "Fn::FindInMap": [
 	            "esinstanceSizing",
-	            "elasticsearch",
+	            {
+		          "Fn::FindInMap": [
+		            "esRegion2Type",
+		            {
+			          "Ref": "AWS::Region"
+			        },
+		            "type"
+		          ]
+		        },
 	            {
 	              "Ref": "ClusterSize"
 	            }
