@@ -213,8 +213,8 @@
 	"ec2instanceSizing": {
       "elasticsearch": {
         "Small": "t2.large",
-        "Medium": "m3.large",
-        "Large": "m3.xlarge"
+        "Medium": "m4.large",
+        "Large": "m4.xlarge"
       }
     },
     "esRegion2Type": {
@@ -608,19 +608,16 @@
       }
     },
     "ProxyServer1EIP": {
+      "DependsOn":"VPCPubSubnet1RouteTableAssociation",
       "Type": "AWS::EC2::EIP",
       "Properties": {
-        "Domain": {
-					"Ref": "VPC"
-				}
-      }
+        "Domain": "vpc"
+	  }
     },
     "ProxyServer1EIPAssoc": {
       "Type": "AWS::EC2::EIPAssociation",
       "Properties": {
-        "EIP": {
-					"Ref": "ProxyServer1EIP"
-				},
+      	"AllocationId":{"Fn::GetAtt" : [ "ProxyServer1EIP", "AllocationId" ]},
         "InstanceId": {
           "Ref": "ProxyServer1"
         }
@@ -907,11 +904,11 @@
           "install_estool": {
             "commands": {
               "0-git_clone": {
-                "command": "wget https://s3.amazonaws.com/solutions-reference/cost-optimization/v2/es_tools-0.1.3.tar.gz",
+                "command": "wget https://s3.amazonaws.com/solutions-reference/cost-optimization/v2/es_tools-0.1.4.tar.gz",
                 "cwd": "/home/ec2-user"
               },
               "1-python_setup": {
-                "command": "pip install es_tools-0.1.3.tar.gz",
+                "command": "pip install es_tools-0.1.4.tar.gz",
                 "cwd": "/home/ec2-user"
               },
               "2-kibana_index": {
@@ -1034,19 +1031,16 @@
 		}
 	},
     "ProxyServer2EIP": {
+      "DependsOn":"VPCPubSubnet2RouteTableAssociation",
       "Type": "AWS::EC2::EIP",
       "Properties": {
-        "Domain": {
-					"Ref": "VPC"
-				}
-      }
+        "Domain": "vpc"
+	  }
     },
     "ProxyServer2EIPAssoc": {
       "Type": "AWS::EC2::EIPAssociation",
       "Properties": {
-        "EIP": {
-					"Ref": "ProxyServer2EIP"
-				},
+        "AllocationId":{"Fn::GetAtt" : [ "ProxyServer2EIP", "AllocationId" ]},
         "InstanceId": {
           "Ref": "ProxyServer2"
         }
