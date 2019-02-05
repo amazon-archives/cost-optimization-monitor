@@ -891,11 +891,19 @@
                 "command": "git clone https://github.com/awslabs/aws-detailed-billing-parser.git",
                 "cwd": "/home/ec2-user"
               },
-              "1-python_setup": {
+              "1-upgrade_urllib3_botocore": {
+                "command": "pip install --upgrade urllib3 botocore",
+                "cwd": "/home/ec2-user/aws-detailed-billing-parser"
+              },
+              "2-refresh_awscli": {
+                "command": "pip install awscli",
+                "cwd": "/home/ec2-user/aws-detailed-billing-parser"
+              },
+              "3-python_setup": {
                 "command": "python setup.py install",
                 "cwd": "/home/ec2-user/aws-detailed-billing-parser"
               },
-              "2-dbr_setup": {
+              "4-dbr_setup": {
                 "command": "/tmp/setup.dbr",
                 "cwd": "/home/ec2-user"
               }
