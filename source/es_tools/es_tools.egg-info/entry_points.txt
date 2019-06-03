@@ -1,0 +1,4 @@
+[console_scripts]
+es-export = es_tools.es_export:cli_export
+es-import = es_tools.es_import:cli_import
+

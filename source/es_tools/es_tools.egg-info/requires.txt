@@ -1,0 +1,4 @@
+boto3>=1.9.120
+click>=7.0
+elasticsearch<7.0.0,>=6.0.0
+requests_aws4auth>=0.9
