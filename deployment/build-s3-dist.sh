@@ -56,11 +56,6 @@ replace="s/%%VERSION%%/$2/g"
 echo "sed -i '' -e $replace $dist_dir/cost-optimization-monitor.template"
 sed -i '' -e "$replace" "$dist_dir"/cost-optimization-monitor.template
 
-echo "Updating dist bucket in template with $3"
-replace="s/%%DIST_BUCKET_NAME%%/$3/g"
-echo "sed -i '' -e $replace $dist_dir/cost-optimization-monitor.template"
-sed -i '' -e "$replace" "$dist_dir"/cost-optimization-monitor.template
-
 echo "------------------------------------------------------------------------------"
 echo "[Packing] ES Tools"
 echo "------------------------------------------------------------------------------"
