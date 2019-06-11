@@ -1778,7 +1778,7 @@
             "Fn::Join": [
               "",
               [
-                "%%DIST_BUCKET_NAME%%-",
+                "%%TEMPLATE_BUCKET_NAME%%-",
                 {
                   "Ref": "AWS::Region"
                 }
